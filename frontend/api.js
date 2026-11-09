@@ -1,5 +1,5 @@
 /* Camada de serviços — única parte do front que fala com o back-end (backend/api/api.py).
-   Contrato completo: docs/contrato_api.md.
+   Rotas e formatos: docs/04_API.md.
 
    Endereço da API:
    - aberto pela própria API (http://127.0.0.1:8000): usa a mesma origem, '/api';

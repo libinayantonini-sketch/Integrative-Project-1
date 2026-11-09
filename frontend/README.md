@@ -90,7 +90,7 @@ Para desenvolver o front com o **Live Server** do VS Code: deixe a API ligada e 
 
 ##  Integração com o back-end
 
-- Rotas e formatos: [`docs/contrato_api.md`](../docs/contrato_api.md).
+- Rotas e formatos: [`docs/04_API.md`](../docs/04_API.md). Detalhes das telas: [`docs/05_FRONTEND.md`](../docs/05_FRONTEND.md).
 - A URL base é escolhida em `CONFIG.API_URL` (`api.js`): `/api` quando o front é servido pela API,
   `http://127.0.0.1:8000/api` no Live Server, ou o valor de `window.API_URL` se for definido antes de `api.js`.
 - Vídeos e imagens de frames vêm da API (`/api/analises/<id>/video` e `/api/analises/<id>/frames/<n>/imagem`).

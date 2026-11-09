@@ -10,7 +10,7 @@ Execução (na raiz do repositório, com o venv ativado):
 Depois abra http://127.0.0.1:8000 no navegador (a API também entrega o front).
 
 Todas as rotas de dados ficam em /api/... e respondem JSON (exceto vídeos e imagens).
-O contrato completo está em docs/contrato_api.md.
+Rotas e formatos estão em docs/04_API.md.
 """
 import datetime as dt
 import logging

@@ -14,6 +14,7 @@ campus Londrina, sob orientação do professor Danilo.
 ## 📋 Sumário
 
 - [Como funciona](#-como-funciona)
+- [Documentação](#-documentação)
 - [Estrutura do repositório](#-estrutura-do-repositório)
 - [Como executar (Windows)](#-como-executar-windows)
 - [Usando o sistema](#-usando-o-sistema)
@@ -26,12 +27,13 @@ campus Londrina, sob orientação do professor Danilo.
 
 ## 🔄 Como funciona
 
-![Organização dos Projetos de Visão Computacional](img-REDME/arquitetura-projeto.png)
-
-```
-Front (navegador) ──► API (Flask) ──► MySQL
-                       │
-                       └─► Modelo YOLO26 (backend/modelos/detector_v1.pt)
+```mermaid
+flowchart LR
+    U(["👤 Usuário"]) --> F["🖥️ Front<br/>frontend/"]
+    F -- "HTTP / JSON" --> A["🔌 API Flask<br/>backend/api/"]
+    A --> M["🧠 Modelo YOLO26<br/>backend/modelos/detector_v1.pt"]
+    A -- SQL --> D[("🐬 MySQL<br/>projeto_sinalizacoes")]
+    A --> S[("💾 Vídeos<br/>backend/storage/")]
 ```
 
 1. O usuário envia um vídeo (10–40 s) com o **local**, a **data** e o **horário** da gravação.
@@ -41,7 +43,15 @@ Front (navegador) ──► API (Flask) ──► MySQL
 4. O front mostra o progresso e, ao terminar, o vídeo com as placas rotuladas, a consulta de frames
    (original × rotulado) e a lista de detecções para revisão.
 
-Detalhes: [`docs/arquitetura.md`](docs/arquitetura.md) · Rotas e formatos: [`docs/contrato_api.md`](docs/contrato_api.md)
+## 📚 Documentação
+
+| Documento | Conteúdo |
+|---|---|
+| [🗺️ Arquitetura visual](docs/01_ARQUITETURA_VISUAL.md) | Como as partes se encaixam, com diagramas — **comece por aqui** |
+| [▶️ Manual de execução](docs/02_MANUAL_DE_EXECUCAO.md) | Passo a passo completo para rodar na sua máquina e usar a página |
+| [🐬 Banco de dados](docs/03_BANCO_DE_DADOS.md) | Tabelas, relacionamentos e o que acontece no banco durante o uso |
+| [🔌 API](docs/04_API.md) | Todas as rotas, formatos JSON, modelo e pipeline |
+| [🖥️ Front-end](docs/05_FRONTEND.md) | As telas e como conversam com a API |
 
 ## 📁 Estrutura do repositório
 
@@ -59,19 +69,19 @@ Detalhes: [`docs/arquitetura.md`](docs/arquitetura.md) · Rotas e formatos: [`do
 │   ├── migracoes/         # scripts que criam/alteram o banco (aplicados em ordem)
 │   └── exemplos/          # consultas e revisões de exemplo
 ├── notebooks/             # treino do modelo no Google Colab
-├── docs/                  # arquitetura, contrato da API, métricas do modelo
-├── img-REDME/             # imagens deste README
-└── extracao_frames.py     # script inicial de extração (substituído por backend/visao/pipeline.py)
+└── docs/                  # documentação (arquitetura, manual, banco, API, front) e métricas do modelo
 ```
 
 ## 🚀 Como executar (Windows)
 
 Tudo roda na sua máquina: **MySQL** + **API** (que também entrega o front).
+Abaixo está o resumo; o passo a passo completo, com as opções de configuração e a solução de problemas,
+está no [**Manual de execução**](docs/02_MANUAL_DE_EXECUCAO.md).
 
 ### Pré-requisitos
 
 - [Python 3.10 ou mais recente](https://www.python.org/downloads/) (marque *Add Python to PATH* na instalação)
-- [MySQL Server 8](https://dev.mysql.com/downloads/installer/) (o mesmo instalador traz o Workbench). Anote a senha do usuário `root`.
+- [MySQL Server 8.4 LTS](https://dev.mysql.com/downloads/mysql/) (*MSI Installer* para Windows). Anote a senha do usuário `root`.
 - Git
 
 Não é preciso GPU nem instalar FFmpeg (vem junto com as dependências).
@@ -193,7 +203,7 @@ Banco de dados desenvolvido pela equipe de banco de dados (`database/`).
 **Boas práticas do grupo:**
 - Não suba o `backend/.env` (tem senha) nem vídeos (`backend/storage/`).
 - Mudanças no banco: novo script numerado em `database/migracoes/`, nunca edite um já aplicado.
-- Mudanças em rotas: atualize `docs/contrato_api.md` e `frontend/api.js` no mesmo PR.
+- Mudanças em rotas, tabelas ou telas: atualize o documento correspondente em `docs/` no mesmo PR.
 
 ---
 
