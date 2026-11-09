@@ -1,0 +1,22 @@
+# Configuração local (tem a senha do MySQL)
+backend/.env
+
+# Vídeos enviados e processados
+backend/storage/*
+!backend/storage/.gitkeep
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Pesos baixados automaticamente pelo Ultralytics (o modelo do projeto fica em backend/modelos/)
+/yolo26*.pt
+/*.pt
+
+# Sistema / editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

@@ -2,122 +2,181 @@
 
 ![Status](https://img.shields.io/badge/status-em%20desenvolvimento-yellow)
 
-Repositório dedicado ao desenvolvimento dos scripts do projeto **Monitoramento de Vias Públicas de Londrina**, cujo objetivo é coletar, processar e analisar dados sobre as condições das vias da cidade, apoiando a identificação de problemas urbanos e a tomada de decisões.
+Sistema que recebe vídeos gravados no trânsito de Londrina, detecta **placas de trânsito** com visão
+computacional (YOLO26) e permite consultar o vídeo com as placas rotuladas, comparar cada frame
+original com a versão rotulada e revisar as detecções da IA.
 
-> ⚠️ **Projeto em desenvolvimento.** Os scripts e a documentação podem mudar com frequência.
+Projeto Integrador de Visão Computacional — Universidade Tecnológica Federal do Paraná (UTFPR),
+campus Londrina, sob orientação do professor Danilo.
 
 ---
 
 ## 📋 Sumário
 
-- [Sobre o projeto](#-sobre-o-projeto)
-- [Arquitetura](#️-arquitetura)
-- [Objetivos](#-objetivos)
+- [Como funciona](#-como-funciona)
 - [Estrutura do repositório](#-estrutura-do-repositório)
-- [Tecnologias](#-tecnologias)
-- [Como executar](#-como-executar)
+- [Como executar (Windows)](#-como-executar-windows)
+- [Usando o sistema](#-usando-o-sistema)
+- [Problemas comuns](#-problemas-comuns)
+- [Tecnologias](#️-tecnologias)
 - [Equipe](#-equipe)
 - [Como contribuir](#-como-contribuir)
-- [Licença](#-licença)
 
 ---
 
-## 📖 Sobre o projeto
-
-O monitoramento das vias públicas é fundamental para promover a mobilidade urbana, aumentar a segurança no trânsito e melhorar a qualidade de vida da população. Nesse contexto, este projeto tem como objetivo automatizar etapas do processamento e da análise de dados das vias públicas de Londrina – PR, utilizando vídeos como fonte de informação. Por meio de scripts desenvolvidos em Python, os vídeos são divididos em frames (quadros), que são posteriormente analisados para identificar elementos relevantes da infraestrutura urbana, como placas de trânsito, semáforos, buracos e faixas de pedestres.
-
-O projeto é desenvolvido no âmbito da disciplina de Projeto Integrador, da Universidade Tecnológica Federal do Paraná (UTFPR), campus Londrina. A disciplina tem como propósito incentivar os alunos a aplicar os conhecimentos adquiridos ao longo do curso no desenvolvimento colaborativo de soluções tecnológicas para problemas reais. Sob a orientação do professor Danilo, o trabalho busca integrar programação e visão computacional para contribuir com a análise das condições das vias urbanas e fornecer informações que possam auxiliar no planejamento e na gestão da mobilidade urbana.
-
-## 🏗️ Arquitetura
-
-Este repositório corresponde ao **Projeto 2 — Monitoramento de Vias Públicas de Londrina**, que faz parte do Projeto Integrador de Visão Computacional. A arquitetura é replicada nos dois projetos do grupo (o Projeto 1 trata do monitoramento ambiental e agrícola).
+## 🔄 Como funciona
 
 ![Organização dos Projetos de Visão Computacional](img-REDME/arquitetura-projeto.png)
 
-No Projeto 2, o fluxo é composto por três camadas:
+```
+Front (navegador) ──► API (Flask) ──► MySQL
+                       │
+                       └─► Modelo YOLO26 (backend/modelos/detector_v1.pt)
+```
 
-| Camada | Função |
-|--------|--------|
-| **Back-end de Visão Computacional** | Processa vídeos das vias públicas e identifica a infraestrutura viária: placas, buracos, faixas de pedestres e estrutura das vias. |
-| **Banco de Dados** | Armazena e disponibiliza os dados gerados pelo processamento. |
-| **Front-end** | Permite visualizar os dados e interagir com o usuário (mapa, painéis e vídeos). |
+1. O usuário envia um vídeo (10–40 s) com o **local**, a **data** e o **horário** da gravação.
+2. A API cadastra o vídeo no banco e o coloca na fila de processamento.
+3. Cada frame passa pelo modelo. A API grava o **vídeo anotado** e guarda no banco
+   **1 frame por segundo** (imagem original) com as **detecções** dele.
+4. O front mostra o progresso e, ao terminar, o vídeo com as placas rotuladas, a consulta de frames
+   (original × rotulado) e a lista de detecções para revisão.
 
-A entrada do sistema são os **vídeos das vias públicas**, que passam pelo back-end, são armazenados no banco de dados e ficam disponíveis no front-end.
-
-## 🎯 Objetivos
-
-- Processar vídeos das vias públicas de Londrina com técnicas de visão computacional.
-- Detectar e classificar elementos da infraestrutura viária: **placas, buracos, faixas de pedestres e estrutura das vias**.
-- Armazenar os resultados em um banco de dados para consulta e análise.
-- Disponibilizar um front-end com mapas e painéis para visualização dos dados.
-- Documentar o processo para que o projeto possa ser reproduzido e ampliado.
+Detalhes: [`docs/arquitetura.md`](docs/arquitetura.md) · Rotas e formatos: [`docs/contrato_api.md`](docs/contrato_api.md)
 
 ## 📁 Estrutura do repositório
 
 ```
-├── backend/        # Visão computacional: processamento dos vídeos e detecções
-├── frontend/       # Visualização dos dados e interação com o usuário
-├── database/       # Scripts e modelagem do banco de dados
-├── scripts/        # Scripts auxiliares
-├── dados/          # Vídeos e dados brutos/processados
-├── docs/           # Documentação, imagens e relatórios
-├── notebooks/      # Testes e análises exploratórias
-└── README.md       # Descrição do repositório no GitHub
+├── frontend/              # Interface web (HTML, CSS, JS) — servida pela própria API
+├── backend/
+│   ├── api/               # api.py (rotas) e requirements.txt
+│   ├── db/                # conexão MySQL, consultas e criar_banco.py
+│   ├── visao/             # modelo (detector.py), vídeo, pipeline e fila de processamento
+│   ├── modelos/           # detector_v1.pt (modelo treinado) + info
+│   ├── storage/           # vídeos enviados e anotados (fora do Git)
+│   ├── config.py
+│   └── .env.example       # modelo do arquivo de configuração
+├── database/
+│   ├── migracoes/         # scripts que criam/alteram o banco (aplicados em ordem)
+│   └── exemplos/          # consultas e revisões de exemplo
+├── notebooks/             # treino do modelo no Google Colab
+├── docs/                  # arquitetura, contrato da API, métricas do modelo
+├── img-REDME/             # imagens deste README
+└── extracao_frames.py     # script inicial de extração (substituído por backend/visao/pipeline.py)
 ```
 
-## 🛠️ Tecnologias
+## 🚀 Como executar (Windows)
 
-> Liste aqui o que o grupo realmente utiliza.
-
-- [Python](https://www.python.org/)
-- [Git](https://git-scm.com/) e [GitHub](https://github.com/)
-- *(ex.: OpenCV, YOLO/PyTorch, banco de dados, flask)*
-
-## 🚀 Como executar
+Tudo roda na sua máquina: **MySQL** + **API** (que também entrega o front).
 
 ### Pré-requisitos
 
-- Python 3.10 ou superior
+- [Python 3.10 ou mais recente](https://www.python.org/downloads/) (marque *Add Python to PATH* na instalação)
+- [MySQL Server 8](https://dev.mysql.com/downloads/installer/) (o mesmo instalador traz o Workbench). Anote a senha do usuário `root`.
 - Git
 
-### Instalação
+Não é preciso GPU nem instalar FFmpeg (vem junto com as dependências).
+
+### 1. Clonar e criar o ambiente Python
 
 ```bash
-# Clone o repositório
-git clone https://github.com/SEU-USUARIO/NOME-DO-REPOSITORIO.git
-
-# Acesse a pasta do projeto
-cd NOME-DO-REPOSITORIO
-
-# (Opcional) Crie e ative um ambiente virtual
+git clone https://github.com/libinayantonini-sketch/Integrative-Project-1.git
+```
+```bash
+cd Integrative-Project-1
+```
+```bash
 python -m venv venv
-source venv/bin/activate      # Linux/macOS
-venv\Scripts\activate         # Windows
-
-# Instale as dependências
-pip install -r requirements.txt
+```
+```bash
+venv\Scripts\activate
+```
+```bash
+pip install -r backend/api/requirements.txt
 ```
 
-### Execução
+A primeira instalação baixa o PyTorch e demora alguns minutos.
+(Linux/macOS: `source venv/bin/activate`.)
+
+### 2. Configurar
+
+Copie `backend/.env.example` para `backend/.env` e troque `SUA_SENHA` pela senha do seu MySQL:
 
 ```bash
-python scripts/nome_do_script.py
+copy backend\.env.example backend\.env
 ```
+
+```
+DB_URL=mysql+pymysql://root:SUA_SENHA@localhost:3306/projeto_sinalizacoes
+```
+
+### 3. Criar o banco (só na primeira vez)
+
+Com o MySQL ligado:
+
+```bash
+python backend/db/criar_banco.py
+```
+
+### 4. Ligar a API
+
+```bash
+python backend/api/api.py
+```
+
+Deixe esse terminal aberto e acesse **http://127.0.0.1:8000** no navegador.
+Em **Configurações**, o status deve aparecer como **Conectada**.
+
+> Prefere editar o front com o Live Server do VS Code? Também funciona: com a API ligada,
+> abra `frontend/index.html` pelo Live Server (porta 5500) — o front usa `http://127.0.0.1:8000/api` sozinho.
+
+## 🖥️ Usando o sistema
+
+| Tela | O que faz |
+|---|---|
+| **Vídeos → Nova análise** | Envia o vídeo com local, data, horário e observações e mostra o progresso do processamento |
+| **Análises** | Lista as análises com busca e filtros por status e local |
+| **Detalhe da análise** | Vídeo com as placas rotuladas (download do anotado e do original), resumo e lista de detecções com **Confirmar / Rejeitar / Corrigir** |
+| ↳ **Consulta de frames** | Busca por **número do frame** ou **tempo** (ou pelas miniaturas) e mostra lado a lado o frame **original** e o **rotulado**, com as detecções daquele frame. O botão *Consultar frame deste instante* abre o frame do ponto em que o vídeo está |
+| **Visão geral / Relatórios** | Totais, gráfico por período, detecções por classe e situação das revisões (exporta CSV) |
+
+Só 1 frame por segundo fica guardado para consulta (configurável em `INTERVALO_EXTRACAO_S`);
+se você pedir um frame que não foi guardado, o sistema mostra o mais próximo.
+
+## 🧯 Problemas comuns
+
+| Mensagem | Solução |
+|---|---|
+| `Não foi possível conectar ao MySQL` | Ligue o MySQL (Serviços do Windows → MySQL80 → Iniciar) e confira usuário/senha no `backend/.env` |
+| `Unknown database 'projeto_sinalizacoes'` | Rode `python backend/db/criar_banco.py` |
+| `Modelo não encontrado` | Confira se `backend/modelos/detector_v1.pt` existe |
+| `ModuleNotFoundError` | Ative o venv (`venv\Scripts\activate`) antes de rodar |
+| Front mostra *Desconectada* | A API não está rodando, ou o front foi aberto em outro endereço |
+
+## 🛠️ Tecnologias
+
+- **Visão computacional:** [Ultralytics YOLO26](https://docs.ultralytics.com/), OpenCV, FFmpeg (imageio-ffmpeg)
+- **API:** Python, Flask
+- **Banco de dados:** MySQL 8, SQLAlchemy, PyMySQL
+- **Front-end:** HTML5, CSS3, JavaScript (sem frameworks)
+- **Treino:** Google Colab (GPU T4)
 
 ## 👥 Equipe
 
 | Integrante | GitHub |
 |------------|--------|
 | João Pedro Magri | [@Jpmagri-07](https://github.com/Jpmagri-07) |
-| Libina | [@usuario](https://github.com/usuario) |
-| Larissa | [@usuario](https://github.com/usuario) |
-| Vitória | [@usuario](https://github.com/usuario) |
-| Clara | [@usuario](https://github.com/usuario) |
-| Ana Clara | [@usuario](https://github.com/usuario) |
+| Libina | [@libinayantonini-sketch](https://github.com/libinayantonini-sketch) |
+| Larissa | — |
+| Vitória | — |
+| Clara | — |
+| Ana Clara | — |
+
+Front-end desenvolvido originalmente em [luizfelipeyg-crypto/frontend_monitoramento_vias](https://github.com/luizfelipeyg-crypto/frontend_monitoramento_vias).
+Banco de dados desenvolvido pela equipe de banco de dados (`database/`).
 
 ## 🤝 Como contribuir
 
-1. Faça um *fork* do projeto ou crie uma *branch* a partir da `main`:
+1. Crie uma *branch* a partir da `main`:
    ```bash
    git checkout -b feature/nome-da-funcionalidade
    ```
@@ -132,9 +191,9 @@ python scripts/nome_do_script.py
 4. Abra um **Pull Request** descrevendo o que foi feito.
 
 **Boas práticas do grupo:**
-- Comente o código e use nomes claros para variáveis e funções.
-- Não suba dados sensíveis ou arquivos muito grandes.
-- Atualize este README quando adicionar novos scripts.
+- Não suba o `backend/.env` (tem senha) nem vídeos (`backend/storage/`).
+- Mudanças no banco: novo script numerado em `database/migracoes/`, nunca edite um já aplicado.
+- Mudanças em rotas: atualize `docs/contrato_api.md` e `frontend/api.js` no mesmo PR.
 
 ---
 

@@ -1,3 +1,13 @@
-Flask
-flask-cors
-imageio-ffmpeg
+# API
+Flask>=3.0
+flask-cors>=4.0
+python-dotenv>=1.0
+# Banco de dados (MySQL)
+SQLAlchemy>=2.0
+PyMySQL>=1.1
+cryptography>=42        # exigido pelo PyMySQL para o login padrão do MySQL 8
+# Vídeo
+imageio-ffmpeg>=0.5     # traz o FFmpeg pronto (não precisa instalar à parte)
+# Modelo (YOLO26 exige Ultralytics 8.4 ou mais recente; instala PyTorch e OpenCV)
+ultralytics>=8.4.0
+numpy

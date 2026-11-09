@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Monitoramento de Vias Públicas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip" id="skip" href="#view">Ir para o conteúdo</a>
+<aside class="side" aria-label="Menu lateral">
+  <div class="brand"><strong>Monitoramento de Vias</strong><span>Detecção de sinalizações viárias</span></div>
+  <nav aria-label="Principal">
+    <p class="navt">Navegação</p>
+    <a href="#/" data-r="">Visão Geral</a>
+    <a href="#/analises" data-r="analises">Análises</a>
+    <a href="#/videos" data-r="videos">Vídeos</a>
+    <a href="#/relatorios" data-r="relatorios">Relatórios</a>
+    <a href="#/configuracoes" data-r="configuracoes">Configurações</a>
+  </nav>
+  <div class="foot">Projeto Integrador — UTFPR<br>v0.2.0</div>
+</aside>
+<noscript><p style="padding:20px">Este sistema precisa de JavaScript ativado para funcionar.</p></noscript>
+<main id="view" tabindex="-1" aria-live="polite"></main>
+<dialog id="modal"></dialog>
+<div id="toast" role="status" aria-live="polite"></div>
+<script src="api.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
